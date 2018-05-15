@@ -66,8 +66,10 @@ def get_pretrained_embeddings(filepath):
     f.close()
   embedding_size = len(embeddings.values()[0])
   print 'Embedding size={}'.format(embedding_size)
-  embeddings[START_MARKER] = [random.gauss(0, 0.01) for _ in range(embedding_size)]
-  embeddings[END_MARKER] = [random.gauss(0, 0.01) for _ in range(embedding_size)]
+  if not START_MARKER in embeddings:
+    embeddings[START_MARKER] = [random.gauss(0, 0.01) for _ in range(embedding_size)]
+  if not END_MARKER in embeddings:
+    embeddings[END_MARKER] = [random.gauss(0, 0.01) for _ in range(embedding_size)]
   if not UNKNOWN_TOKEN in embeddings:
     embeddings[UNKNOWN_TOKEN] = [random.gauss(0, 0.01) for _ in range(embedding_size)]
   return embeddings
