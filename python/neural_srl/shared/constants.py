@@ -14,7 +14,7 @@ WORD_EMBEDDINGS = { "glove50": join(ROOT_DIR, 'data/glove/glove.6B.50d.txt'),
 
 START_MARKER  = '<S>'
 END_MARKER    = '</S>'
-UNKNOWN_TOKEN = '*UNKNOWN*'
+UNKNOWN_TOKEN = '<UNK>'
 UNKNOWN_LABEL = 'O'
 #UNKNOWN_FEATURE = 'FEAT_NONE'
 
