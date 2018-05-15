@@ -26,6 +26,8 @@ class BiLSTMTaggerModel(object):
     # Initialize layers and parameters
     self.embedding_layer = EmbeddingLayer(data.embedding_shapes, data.embeddings)    
     self.params = [p for p in self.embedding_layer.params]
+    self.trainable_params = [p for p in self.embedding_layer.params] \
+        if config.update_embedding else []
     
     self.rnn_layers = [None] * self.num_lstm_layers
     for l in range(self.num_lstm_layers):
@@ -41,9 +43,11 @@ class BiLSTMTaggerModel(object):
                                  prefix='lstm_{}'.format(l))
       print (self.rnn_layers[l])
       self.params.extend(self.rnn_layers[l].params)
+      self.trainable_params.extend(self.rnn_layers[l].params)
     
     self.softmax_layer = SoftmaxLayer(self.lstm_hidden_size, self.label_space_size)
     self.params.extend(self.softmax_layer.params)
+    self.trainable_params.extend(self.softmax_layer.params)
     
     # Build model
     # Shape of x: [seq_len, batch_size, num_features]
@@ -97,9 +101,9 @@ class BiLSTMTaggerModel(object):
     """ We should feed in non-dimshuffled inputs x0, mask0 and y0.
     """
     loss = CrossEntropyLoss().connect(self.scores, self.mask, self.y)
-    grads = gradient_clipping(tensor.grad(loss, self.params),
-                  self.max_grad_norm)
-    updates = adadelta(self.params, grads)
+    grads = gradient_clipping(tensor.grad(loss, self.trainable_params),
+                              self.max_grad_norm)
+    updates = adadelta(self.trainable_params, grads)
 
     return theano.function([self.x0, self.mask0, self.y0], loss,
                  name='f_loss',
